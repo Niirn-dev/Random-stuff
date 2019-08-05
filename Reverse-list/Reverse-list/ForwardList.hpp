@@ -1,27 +1,36 @@
 #include <memory>
 #include <iostream>
+#include <initializer_list>
 
 namespace custom_list {
 
+	template <class T>
 	class ForwardList
 	{
-		struct ForwardNode;
+		struct Node;
+		using NodePtr = std::shared_ptr<Node>;
 
-		using NodePtr = std::shared_ptr<ForwardNode>;
-
-		struct ForwardNode
+		struct Node
 		{
-			inline ForwardNode(int d) { data = d; };
+			inline explicit Node(T d) { data = d; };
 
-			int data{ NULL };
+			T data{ T(0) };
 			NodePtr nextNode{ nullptr };
 		};
 
 		NodePtr head{ nullptr };
 
 	public:
-		ForwardList();
-		explicit ForwardList(std::initializer_list<int> il);
+		ForwardList() {};
+		explicit ForwardList(T d) : 
+			head(std::make_shared<Node>(d)) {};
+		explicit ForwardList(std::initializer_list<T> il)
+		{
+			for (auto& item : il)
+			{
+				this->push_back(item);
+			}
+		};
 
 		// Disable copy ctor/assignment 'cause unique_ptr
 		ForwardList(const ForwardList&) = delete;
@@ -31,14 +40,63 @@ namespace custom_list {
 		ForwardList(ForwardList&&) = default;
 		ForwardList& operator=(ForwardList&&) = default;
 
-		friend std::ostream& operator<<(std::ostream& os, const ForwardList& l);
+		friend std::ostream& operator<<(std::ostream& os, const ForwardList& l)
+		{
+			auto currentNode{ l.head };
 
-		void push_back(int data);
+			while (currentNode != nullptr)
+			{
+				os << ' ' << currentNode->data;
+				currentNode = currentNode->nextNode;
+			}
+
+			return os;
+		};
+
+		void push_back(T data)
+		{
+			if (isEmpty())
+			{
+				this->head = std::make_shared<Node>(data);
+			}
+			else
+			{
+				getLast(this->head)->nextNode = std::make_shared<Node>(data);
+			}
+		};
 
 	private:
-		NodePtr getLast(NodePtr currentNode);
+		NodePtr getLast(NodePtr currentNode)
+		{
+			if (currentNode->nextNode == nullptr)
+			{
+				return currentNode;
+			}
+			else
+			{
+				return getLast(currentNode->nextNode);
+			}
+		};
 
-		inline bool isEmpty();
-		
+		inline bool isEmpty() noexcept
+		{
+			return this->head == nullptr;
+		};
 	};
-}
+
+	template <class T>
+	class MyClass {
+		T data;
+	public:
+		explicit MyClass(T d) :
+			data(d)
+		{
+
+		};
+		T getData()
+		{
+			return this->data;
+		};
+	};
+
+} // namespace custom_list

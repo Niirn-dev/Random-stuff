@@ -5,6 +5,8 @@
 
 namespace custom_list {
 
+/*	Moved the implementation to header file due to making a class into a template
+
 	ForwardList::ForwardList()
 	{
 		std::cout << "Called default ctor of ForwardList class\n";
@@ -36,15 +38,15 @@ namespace custom_list {
 	{
 		if (isEmpty())
 		{
-			this->head = std::make_shared<ForwardList::ForwardNode>(data);
+			this->head = std::make_shared<ForwardList::Node>(data);
 		}
 		else
 		{
-			getLast(this->head)->nextNode = std::make_shared<ForwardList::ForwardNode>(data);
+			getLast(this->head)->nextNode = std::make_shared<ForwardList::Node>(data);
 		}
 	}
 
-	ForwardList::NodePtr ForwardList::getLast(NodePtr currentNode)
+	std::shared_ptr<ForwardList::Node> ForwardList::getLast(std::shared_ptr<ForwardList::Node> currentNode)
 	{
 		if (currentNode->nextNode == nullptr)
 		{
@@ -59,6 +61,6 @@ namespace custom_list {
 	inline bool ForwardList::isEmpty()
 	{
 		return this->head == nullptr;
-	}
-	
+	}*/
+
 }
