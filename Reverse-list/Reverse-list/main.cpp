@@ -16,10 +16,6 @@ int main(int argc, char** argv)
 
 	std::cout << "List values after push_back:" << *fwdList << std::endl;
 
-
-	/*auto test{ custom_list::MyClass<int>(10) };
-	std::cout << test.getData();*/
-
 	auto tmp = _getch();
 	return 0;
 }

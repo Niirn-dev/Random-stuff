@@ -84,19 +84,4 @@ namespace custom_list {
 		};
 	};
 
-	template <class T>
-	class MyClass {
-		T data;
-	public:
-		explicit MyClass(T d) :
-			data(d)
-		{
-
-		};
-		T getData()
-		{
-			return this->data;
-		};
-	};
-
 } // namespace custom_list
