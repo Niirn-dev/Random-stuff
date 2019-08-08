@@ -1,6 +1,8 @@
 #include <memory>
 #include <iostream>
 #include <initializer_list>
+#include <mutex>
+#include <exception>
 
 namespace custom_list {
 
@@ -19,6 +21,10 @@ namespace custom_list {
 		};
 
 		NodePtr head{ nullptr };
+
+		mutable std::mutex m;
+		mutable std::size_t size{ 0 };
+		mutable bool isSizeValid{ false };
 
 	public:
 		ForwardList() {};
@@ -63,7 +69,64 @@ namespace custom_list {
 			{
 				getLast(this->head)->nextNode = std::make_shared<Node>(data);
 			}
+
+			this->isSizeValid = false;
 		};
+
+		std::size_t getSize() const
+		{
+			std::lock_guard<std::mutex> guard(this->m);
+
+			if (!this->isSizeValid)
+			{
+				this->size = 0;
+				auto currentNode{ this->head };
+
+				while (currentNode != nullptr)
+				{
+					++this->size;
+					currentNode = currentNode->nextNode;
+				}
+
+				this->isSizeValid = true;
+			}
+
+			return this->size;
+		}
+
+		// Get a pointer to the data, that is stored in the node
+		std::unique_ptr<T> at(std::size_t index) const
+		{
+			if (index < this->getSize()) {
+				auto currentNode{ this->head };
+
+				for (std::size_t i = 0; i < index; ++i)
+				{
+					currentNode = currentNode->nextNode;
+				}
+
+				return std::make_unique<T>(currentNode->data);
+			}
+
+			throw std::out_of_range("ForwardList.at(): specified index is out of range.\n");
+		}
+
+		void reverse()
+		{
+			NodePtr previousNode{ nullptr };
+			NodePtr currentNode{ this->head };
+			NodePtr nextNode{ nullptr };
+
+			while (currentNode != nullptr)
+			{
+				nextNode = currentNode->nextNode;
+				currentNode->nextNode = previousNode;
+				previousNode = currentNode;
+				currentNode = nextNode;
+			}
+
+			this->head = previousNode;
+		}
 
 	private:
 		NodePtr getLast(NodePtr currentNode)
